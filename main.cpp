@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <windows.h>
 
 using namespace std;
 
@@ -14,32 +15,37 @@ enum BlockCode{
 	Z_BLOCK,
 };
 
+enum KeyCode {
+	W = 'w', S, A, D
+};
+
 class Point{
 private:
 	int x, y;
 
 protected:
-	int GetX(){
+	
+	void Set(int x, int y) {
+		this->x = x;
+		this->y = y;
+	}
+
+public:
+	Point() {}
+
+	Point(int x, int y) {
+		this->x = x;
+		this->y = y;
+	}
+int GetX(){
 		return x;
 	}
 	int GetY(){
 		return y;
 	}
-
-public:
-	Point(){}
-	
-	Point(int x, int y) {
-		this->x = x;
-		this->y = y;
-	}
-	void Set(int x, int y) {
-		this->x = x;
-		this->y = y;
-	}
 };
 
-class Vector2D : private Point{
+class Vector2D : public Point {
 private:
 public:
 	Vector2D() {}
@@ -53,9 +59,9 @@ public:
 		int adding_x = op.GetX();
 		int adding_y = op.GetY();
 
-		Vector2D temp;	
+		Vector2D temp;
 		temp.Set(before_x + adding_x, before_y + adding_y);
-		
+
 		return temp;
 	}
 
@@ -66,9 +72,9 @@ public:
 		int sub_x = op.GetX();
 		int sub_y = op.GetY();
 
-		Vector2D temp;	
+		Vector2D temp;
 		temp.Set(before_x - sub_x, before_y - sub_y);
-		
+
 		return temp;
 	}
 
@@ -86,9 +92,9 @@ public:
 	GameObject() {
 
 	}
-	virtual ~GameObject() = 0;	
-	virtual void Update() = 0;	
-	virtual vector<Point> GetPoint() = 0;
+	virtual ~GameObject() {}
+	virtual void Update() = 0;
+	virtual vector<Point> GetCoordinate() = 0;
 
 };
 
@@ -101,18 +107,13 @@ private:
 
 public:
 
-	Tetrimino(): DOWN(0, 1), RIGHT(1, 0), LEFT(-1,0) {}
-	
-	Tetrimino(){
-		DOWN(0, 1);
-		RIGHT(0, 1);
-	}
-	
-	Tetrimino(int block) : DOWN(0, 1), RIGHT(1, 0), LEFT(-1,0){
-		switch(block){
+	Tetrimino() : DOWN(0, 1), RIGHT(1, 0), LEFT(-1, 0) {}
+
+	Tetrimino(int block) : DOWN(0, 1), RIGHT(1, 0), LEFT(-1, 0) {
+		switch (block) {
 		case I_BLOCK:
 			for (int i = 0; i < POINT_COUNT; i++) {
-				position[i] = Vector2D(i,0);
+				position[i] = Vector2D(i, 0);
 			}
 			break;
 		case O_BLOCK:
@@ -142,21 +143,52 @@ public:
 		}
 	}
 
-	void Update(){
+	void Update() {
 
-	}	
-
-	vector<Point> GetPoint() {
-		vector <Point> *temp = &position;
 	}
 
+	vector<Point> GetCoordinate() {
+		vector<Point> temp;
+		for (int i = 0; i < POINT_COUNT; i++) {
+			temp.push_back((Point)position[i]);
+		}
+		return temp;
+	}
+
+};
+
+class Renderer{
+private:
+public:
+	Renderer() {
+	}
+	~Renderer() {}
+
+	void Update() {
+	}
+	void Render(GameObject &g) {
+		
+		vector<Point> coordinate = g.GetCoordinate();
+
+		for (Point i : coordinate) {
+			gotoxy(i.GetX(), i.GetY());
+			cout << "бр";
+		}
+
+	}
+	void gotoxy(int x, int y)
+	{
+		COORD pos = { x - 1, y - 1 };
+		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+	}
 };
 
 int main() {
 
 	Vector2D a(2, 5);
 	Vector2D b(3, 5);
-	Tetrimino t;
+	Tetrimino t(I_BLOCK);
+
 
 	getchar();
 }

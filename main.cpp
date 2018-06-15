@@ -59,17 +59,18 @@ public:
 		Set(x, y);
 	}
 	Vector2D operator + (Vector2D op) {
-		int before_x = this->GetX();
-		int before_y = this->GetY();
+		int old_x = this->GetX();
+		int old_y = this->GetY();
 
 		int adding_x = op.GetX();
 		int adding_y = op.GetY();
 
 		Vector2D temp;
-		temp.Set(before_x + adding_x, before_y + adding_y);
+		temp.Set(old_x + adding_x, old_y + adding_y);
 
 		return temp;
 	}
+
 	Vector2D operator += (Vector2D op) {
 		int before_x = this->GetX();
 		int before_y = this->GetY();
@@ -82,6 +83,7 @@ public:
 
 		return temp;
 	}
+
 	Vector2D operator - (Vector2D op) {
 		int before_x = this->GetX();
 		int before_y = this->GetY();
@@ -99,9 +101,13 @@ public:
 		cout << "x:" << GetX() << ", y:" << GetY() << endl;
 	}
 
-	void Rotate90() {
-		Set(GetY(), GetX());
+	Vector2D Rotate90(Vector2D origin) {
+
+		Vector2D rotated(-(origin.GetY() - GetY()), origin.GetX() - GetX());	
+		
+		return rotated;
 	}
+	
 };
 
 class GameObject {
@@ -119,6 +125,8 @@ public:
 class Tetrimino : public GameObject {
 private:
 	Vector2D position[POINT_COUNT];
+	int blockType;
+	Vector2D origin;
 	const Vector2D DOWN;
 	const Vector2D RIGHT;
 	const Vector2D LEFT;
@@ -127,8 +135,11 @@ public:
 
 	Tetrimino() : DOWN(0, 1), RIGHT(1, 0), LEFT(-1, 0) {}
 
-	Tetrimino(int block) : DOWN(0, 1), RIGHT(1, 0), LEFT(-1, 0) {
-		switch (block) {
+	Tetrimino(int blockType) : DOWN(0, 1), RIGHT(1, 0), LEFT(-1, 0) {
+
+		this->blockType = blockType;
+		origin = Vector2D(0, 0);
+		switch (blockType) {
 		case I_BLOCK:
 			for (int i = 0; i < POINT_COUNT; i++) {
 				position[i] = Vector2D(i, 0);
@@ -159,20 +170,21 @@ public:
 			position[2] = Vector2D(1, 0); position[3] = Vector2D(1, 1);
 			break;
 		}
+
+		for (int i = 0; i < POINT_COUNT; i++) {
+			position[i] = position[i]+ RIGHT;
+		    origin = origin + RIGHT;
+		}
 	}
 
 	void Update() {
 
-		/*
 		for (int i = 0; i < POINT_COUNT; i++) {
-			position[i] = position[i] + DOWN;
-		}
-		*/
-		
-		for (int i = 0; i < POINT_COUNT; i++) {
-			position[i].Rotate90();
-		}
 
+			position[i] = position[i].Rotate90(origin);
+
+		}
+	
 	}
 
 	vector<Point> GetCoordinate() {
@@ -206,7 +218,7 @@ public:
 		
 		for (int i = 0; i < POINT_COUNT; i++) {
 			gotoxy(newCoordinate[i].GetX(), newCoordinate[i].GetY());
-			cout << "a";
+			cout << "#";
 		}
 
 	}
@@ -232,15 +244,15 @@ public:
 
 int main() {
 
-	Tetrimino t(J_BLOCK);
+	Tetrimino t(T_BLOCK);
 
 	Renderer r;
 
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 10; i++) {
 		t.Update();
 		r.Render(t);
 
-		Sleep(1000);
+		Sleep(800);
 	}
 
 	r.Render(t);

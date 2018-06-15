@@ -103,7 +103,11 @@ public:
 
 	Vector2D Rotate90(Vector2D origin) {
 
-		Vector2D rotated(-(origin.GetY() - GetY()), origin.GetX() - GetX());	
+		Vector2D rotated(GetX(), GetY());	
+		rotated = rotated - origin;
+		rotated.Set(-rotated.GetY(), rotated.GetX());
+
+		rotated = rotated + origin;
 		
 		return rotated;
 	}
@@ -138,53 +142,65 @@ public:
 	Tetrimino(int blockType) : DOWN(0, 1), RIGHT(1, 0), LEFT(-1, 0) {
 
 		this->blockType = blockType;
-		origin = Vector2D(0, 0);
-		switch (blockType) {
+		origin = Vector2D(1, 1);
+
+		switch (blockType){
 		case I_BLOCK:
+			origin = Vector2D(2, 2);
 			for (int i = 0; i < POINT_COUNT; i++) {
-				position[i] = Vector2D(i, 0);
+				position[i] = Vector2D(i, 1);
 			}
 			break;
 		case O_BLOCK:
-			position[0] = Vector2D(0, 0); position[1] = Vector2D(0, 1);
-			position[2] = Vector2D(1, 0); position[3] = Vector2D(1, 1);
+			position[0] = Vector2D(0, 1); position[1] = Vector2D(0, 2);
+			position[2] = Vector2D(1, 1); position[3] = Vector2D(1, 2);
 			break;
 		case T_BLOCK:
-			position[0] = Vector2D(0, 0); position[1] = Vector2D(1, 0);
-			position[2] = Vector2D(1, 1); position[3] = Vector2D(2, 0);
+			position[0] = Vector2D(0, 1); position[1] = Vector2D(1, 0);
+			position[2] = Vector2D(1, 1); position[3] = Vector2D(1, 2);
 			break;
 		case J_BLOCK:
-			position[0] = Vector2D(0, 1); position[1] = Vector2D(1, 1);
-			position[2] = Vector2D(2, 0); position[3] = Vector2D(2, 1);
+			position[0] = Vector2D(0, 0); position[1] = Vector2D(1, 0);
+			position[2] = Vector2D(1, 1); position[3] = Vector2D(1, 2);
 			break;
 		case L_BLOCK:
-			position[0] = Vector2D(0, 1); position[1] = Vector2D(1, 1);
-			position[2] = Vector2D(2, 1); position[3] = Vector2D(2, 2);
+			position[0] = Vector2D(0, 3); position[1] = Vector2D(1, 0);
+			position[2] = Vector2D(1, 1); position[3] = Vector2D(1, 2);
 			break;
 		case Z_BLOCK:
 			position[0] = Vector2D(0, 0); position[1] = Vector2D(0, 1);
 			position[2] = Vector2D(1, 1); position[3] = Vector2D(1, 2);
 			break;
 		case S_BLOCK:
-			position[0] = Vector2D(0, 2); position[1] = Vector2D(0, 1);
+			position[0] = Vector2D(0, 1); position[1] = Vector2D(0, 2);
 			position[2] = Vector2D(1, 0); position[3] = Vector2D(1, 1);
 			break;
 		}
 
+		origin = origin + RIGHT;
+
 		for (int i = 0; i < POINT_COUNT; i++) {
-			position[i] = position[i]+ RIGHT;
-		    origin = origin + RIGHT;
+			position[i] = position[i] + RIGHT;
+			position[i] = position[i] + DOWN;
 		}
+
 	}
 
 	void Update() {
-
-		for (int i = 0; i < POINT_COUNT; i++) {
-
-			position[i] = position[i].Rotate90(origin);
-
-		}
+		Rotate();
 	
+	}
+	
+	void Rotate() {
+		
+		if (blockType == O_BLOCK) {
+			return;
+		}
+		
+		for (int i = 0; i < POINT_COUNT; i++) {
+			position[i] = position[i].Rotate90(origin);
+		}
+
 	}
 
 	vector<Point> GetCoordinate() {
@@ -221,6 +237,11 @@ public:
 			cout << "#";
 		}
 
+		gotoxy(1, 20);
+		for (int i = 0; i < POINT_COUNT; i++) {
+			cout << "(" << newCoordinate[i].GetX() << "," << newCoordinate[i].GetY() << ")" << endl;
+		}
+
 	}
 	void gotoxy(int x, int y)
 	{
@@ -244,15 +265,15 @@ public:
 
 int main() {
 
-	Tetrimino t(T_BLOCK);
+	Tetrimino t(I_BLOCK);
 
 	Renderer r;
 
-	for (int i = 0; i < 10; i++) {
+	while(1){
 		t.Update();
 		r.Render(t);
 
-		Sleep(800);
+		Sleep(1000);
 	}
 
 	r.Render(t);

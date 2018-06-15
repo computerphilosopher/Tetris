@@ -146,7 +146,7 @@ public:
 	void Update() {
 
 		for (int i = 0; i < POINT_COUNT; i++) {
-			position[i] = position[i] + DOWN;
+			position[i] = position[i] + RIGHT + RIGHT;
 		}
 
 	}

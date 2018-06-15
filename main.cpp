@@ -43,6 +43,12 @@ int GetX(){
 	int GetY(){
 		return y;
 	}
+	bool operator == (Point op) {
+		return (this->GetX() == op.GetX() && this->GetY() == op.GetY());
+	}
+	bool operator != (Point op) {
+		return !(this->GetX() == op.GetX() && this->GetY() == op.GetY());
+	}
 };
 
 class Vector2D : public Point {
@@ -64,7 +70,18 @@ public:
 
 		return temp;
 	}
+	Vector2D operator += (Vector2D op) {
+		int before_x = this->GetX();
+		int before_y = this->GetY();
 
+		int adding_x = op.GetX();
+		int adding_y = op.GetY();
+
+		Vector2D temp;
+		temp.Set(before_x + adding_x, before_y + adding_y);
+
+		return temp;
+	}
 	Vector2D operator - (Vector2D op) {
 		int before_x = this->GetX();
 		int before_y = this->GetY();
@@ -80,7 +97,6 @@ public:
 
 	void PrintVector() {
 		cout << "x:" << GetX() << ", y:" << GetY() << endl;
-
 	}
 
 
@@ -146,7 +162,7 @@ public:
 	void Update() {
 
 		for (int i = 0; i < POINT_COUNT; i++) {
-			position[i] = position[i] + RIGHT + RIGHT;
+			position[i] = position[i] + DOWN;
 		}
 
 	}
@@ -154,7 +170,7 @@ public:
 	vector<Point> GetCoordinate() {
 		vector<Point> temp;
 		for (int i = 0; i < POINT_COUNT; i++) {
-			temp.push_back ((Point)position[i]);
+			temp.push_back((Point)position[i]);
 			//cout << "(" <<temp[i].GetX() << "," <<temp[i].GetY() << ")" << endl;
 		}
 		return temp;
@@ -162,23 +178,28 @@ public:
 
 };
 
-class Renderer{
+class Renderer {
 private:
+	vector <Point> oldCoordinate;
+	vector <Point> newCoordinate;
 public:
 	Renderer() {
+		oldCoordinate = { Point(-1, -1), Point(-1, -1), Point(-1, -1), Point(-1, -1) };
 	}
 	~Renderer() {}
 
 	void Update() {
 	}
-	void Render(GameObject &g) {
-		
-		vector<Point> coordinate = g.GetCoordinate();
 
+	void Render(GameObject &g) {
+
+		newCoordinate = g.GetCoordinate();
+
+		system("cls");
 		for (int i = 0; i < POINT_COUNT; i++) {
-			gotoxy(coordinate[i].GetX(), coordinate[i].GetY());
-			//cout << "(" << coordinate[i].GetX() << "," << coordinate[i].GetY() << ")" << endl;
-			cout << "a" ;
+
+			gotoxy(newCoordinate[i].GetX(), newCoordinate[i].GetY());
+			cout << "a";
 		}
 
 	}
@@ -187,6 +208,10 @@ public:
 		COORD pos = { x, y };
 		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 	}
+
+	void DeleteOldPoint(Point OldPoint) {
+	}
+
 };
 
 int main() {
@@ -199,8 +224,6 @@ int main() {
 	r.Render(t);
 
 	Sleep(1000);
-	t.Update(); t.Update();
-
+	t.Update();
 	r.Render(t);
-
 }

@@ -99,7 +99,9 @@ public:
 		cout << "x:" << GetX() << ", y:" << GetY() << endl;
 	}
 
-
+	void Rotate90() {
+		Set(GetY(), GetX());
+	}
 };
 
 class GameObject {
@@ -161,8 +163,14 @@ public:
 
 	void Update() {
 
+		/*
 		for (int i = 0; i < POINT_COUNT; i++) {
-			position[i] = position[i] + RIGHT;
+			position[i] = position[i] + DOWN;
+		}
+		*/
+		
+		for (int i = 0; i < POINT_COUNT; i++) {
+			position[i].Rotate90();
 		}
 
 	}
@@ -175,7 +183,6 @@ public:
 		}
 		return temp;
 	}
-
 };
 
 class Renderer {
@@ -198,7 +205,6 @@ public:
 		system("cls");
 		
 		for (int i = 0; i < POINT_COUNT; i++) {
-
 			gotoxy(newCoordinate[i].GetX(), newCoordinate[i].GetY());
 			cout << "a";
 		}
@@ -215,10 +221,17 @@ public:
 
 };
 
+class Collider {
+private:
+	
+public:
+	Collider() {};
+	
+	bool CollisionChecked() {}
+};
+
 int main() {
 
-	Vector2D a(2, 5);
-	Vector2D b(3, 5);
 	Tetrimino t(J_BLOCK);
 
 	Renderer r;

@@ -162,7 +162,7 @@ public:
 	void Update() {
 
 		for (int i = 0; i < POINT_COUNT; i++) {
-			position[i] = position[i] + DOWN;
+			position[i] = position[i] + RIGHT;
 		}
 
 	}
@@ -196,6 +196,7 @@ public:
 		newCoordinate = g.GetCoordinate();
 
 		system("cls");
+		
 		for (int i = 0; i < POINT_COUNT; i++) {
 
 			gotoxy(newCoordinate[i].GetX(), newCoordinate[i].GetY());
@@ -221,9 +222,13 @@ int main() {
 	Tetrimino t(J_BLOCK);
 
 	Renderer r;
-	r.Render(t);
 
-	Sleep(1000);
-	t.Update();
+	for (int i = 0; i < 5; i++) {
+		t.Update();
+		r.Render(t);
+
+		Sleep(1000);
+	}
+
 	r.Render(t);
 }

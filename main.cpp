@@ -5,7 +5,12 @@
 using namespace std;
 
 const int POINT_COUNT = 4;
-enum BlockCode{
+
+enum CanvasSize {
+	WIDTH = 40,
+	HEIGHT = 30
+};
+enum BlockCode {
 	I_BLOCK,
 	O_BLOCK,
 	T_BLOCK,
@@ -13,6 +18,7 @@ enum BlockCode{
 	L_BLOCK,
 	S_BLOCK,
 	Z_BLOCK,
+	RANDOM
 };
 
 enum KeyCode {
@@ -121,14 +127,14 @@ public:
 
 	}
 	virtual ~GameObject() {}
-	virtual void Update() = 0;
+	virtual void Update()=0;
 	virtual vector<Point> GetCoordinate() = 0;
 
 };
 
 class Tetrimino : public GameObject {
 private:
-	Vector2D position[POINT_COUNT];
+	vector<Vector2D> position;
 	int blockType;
 	Vector2D origin;
 	const Vector2D DOWN;
@@ -138,6 +144,8 @@ private:
 public:
 
 	Tetrimino() : DOWN(0, 1), RIGHT(1, 0), LEFT(-1, 0) {}
+
+	~Tetrimino() { cout << "Destoryed" << endl; }
 
 	Tetrimino(int blockType) : DOWN(0, 1), RIGHT(1, 0), LEFT(-1, 0) {
 
@@ -175,6 +183,9 @@ public:
 			position[0] = Vector2D(0, 1); position[1] = Vector2D(0, 2);
 			position[2] = Vector2D(1, 0); position[3] = Vector2D(1, 1);
 			break;
+		default:
+			cout << "wrong block type" << endl;
+			break;
 		}
 
 		origin = origin + RIGHT;
@@ -187,15 +198,12 @@ public:
 	}
 
 	void Update() {
-		Rotate();
-	
+		for (int i = 0; i < POINT_COUNT; i++) {
+			position[i] = position[i] + DOWN;
+		}
 	}
 	
 	void Rotate() {
-		
-		if (blockType == O_BLOCK) {
-			return;
-		}
 		
 		for (int i = 0; i < POINT_COUNT; i++) {
 			position[i] = position[i].Rotate90(origin);
@@ -237,7 +245,7 @@ public:
 			cout << "#";
 		}
 
-		gotoxy(1, 20);
+		gotoxy(0, CanvasSize::HEIGHT);
 		for (int i = 0; i < POINT_COUNT; i++) {
 			cout << "(" << newCoordinate[i].GetX() << "," << newCoordinate[i].GetY() << ")" << endl;
 		}
@@ -254,26 +262,48 @@ public:
 
 };
 
-class Collider {
+class Board : GameObject{
 private:
-	
-public:
-	Collider() {};
-	
-	bool CollisionChecked() {}
-};
+	bool Grid[WIDTH][HEIGHT];
 
+public:
+	Board(){
+		for (int i = 0; i < WIDTH; i++) {
+			for (int j = 0; j < HEIGHT; j++) {
+				Grid[i][j] = false;
+			}
+		}
+	}
+
+	void Update() {
+
+	}
+
+	bool IsWall(){ 
+
+	} 
+	bool IsLand() {
+
+	}
+
+	vector <Point> GetCoordinate() {
+
+	}
+	~Board(){}
+
+
+};
 int main() {
 
 	Tetrimino t(I_BLOCK);
 
 	Renderer r;
 
-	while(1){
+	for(int i=0; i<100; i++){
 		t.Update();
 		r.Render(t);
 
-		Sleep(1000);
+		Sleep(100);
 	}
 
 	r.Render(t);

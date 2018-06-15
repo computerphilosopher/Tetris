@@ -145,6 +145,10 @@ public:
 
 	void Update() {
 
+		for (int i = 0; i < POINT_COUNT; i++) {
+			position[i] = position[i] + DOWN;
+		}
+
 	}
 
 	vector<Point> GetCoordinate() {
@@ -192,6 +196,11 @@ int main() {
 	Tetrimino t(J_BLOCK);
 
 	Renderer r;
+	r.Render(t);
+
+	Sleep(1000);
+	t.Update(); t.Update();
+
 	r.Render(t);
 
 }

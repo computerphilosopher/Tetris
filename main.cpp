@@ -126,7 +126,7 @@ public:
 			break;
 		case J_BLOCK:
 			position[0] = Vector2D(0, 1); position[1] = Vector2D(1, 1);
-			position[2] = Vector2D(0, 2); position[3] = Vector2D(1, 2);
+			position[2] = Vector2D(2, 0); position[3] = Vector2D(1, 2);
 			break;
 		case L_BLOCK:
 			position[0] = Vector2D(0, 1); position[1] = Vector2D(1, 1);
@@ -149,9 +149,12 @@ public:
 
 	vector<Point> GetCoordinate() {
 		vector<Point> temp;
+		/*
 		for (int i = 0; i < POINT_COUNT; i++) {
 			temp.push_back((Point)position[i]);
+			cout << "x:" << temp[i].GetX() << ", y:" << temp[i].GetY() << endl;
 		}
+		*/
 		return temp;
 	}
 
@@ -170,15 +173,15 @@ public:
 		
 		vector<Point> coordinate = g.GetCoordinate();
 
-		for (Point i : coordinate) {
-			gotoxy(i.GetX(), i.GetY());
+		for (int i = 0; i < coordinate.size(); i++) {
+			gotoxy(coordinate[i].GetX(), coordinate[i].GetY());
 			cout << "бр";
 		}
 
 	}
 	void gotoxy(int x, int y)
 	{
-		COORD pos = { x - 1, y - 1 };
+		COORD pos = { x-1, y-1 };
 		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 	}
 };
@@ -187,8 +190,9 @@ int main() {
 
 	Vector2D a(2, 5);
 	Vector2D b(3, 5);
-	Tetrimino t(I_BLOCK);
+	Tetrimino t(O_BLOCK);
 
+	Renderer r;
+	r.Render(t);
 
-	getchar();
 }

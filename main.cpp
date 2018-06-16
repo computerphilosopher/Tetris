@@ -120,19 +120,7 @@ public:
 	
 };
 
-class GameObject {
-private:
-public:
-	GameObject() {
-
-	}
-	virtual ~GameObject() {}
-	virtual void Update()=0;
-	virtual vector<Point> GetCoordinate() = 0;
-
-};
-
-class Tetrimino : public GameObject {
+class Tetrimino{
 private:
 	vector<Vector2D> position;
 	int blockType;
@@ -197,9 +185,9 @@ public:
 
 	}
 
-	void Update() {
+	void Control() {
 		for (int i = 0; i < POINT_COUNT; i++) {
-			position[i] = position[i] + DOWN;
+			position[i] = position[i] + RIGHT;
 		}
 	}
 	
@@ -211,43 +199,82 @@ public:
 
 	}
 
-	vector<Point> GetCoordinate() {
-		vector<Point> temp;
-		for (int i = 0; i < POINT_COUNT; i++) {
-			temp.push_back((Point)position[i]);
-			//cout << "(" <<temp[i].GetX() << "," <<temp[i].GetY() << ")" << endl;
-		}
-		return temp;
+	vector<Vector2D> GetCoordinate() {
+		return position;
 	}
+};
+
+class Board{
+private:
+	vector< vector<bool> > Grid;
+
+public:
+	Board(){
+		Grid = vector< vector<bool> >(WIDTH);
+		for (int i = 0; i < WIDTH; i++) {
+			for (int j = 0; j < HEIGHT; j++) {
+				Grid[i].push_back(false);
+			}
+		}
+	}
+
+	bool IsWall(vector<Vector2D> &tetrimino){  
+
+		for (int i = 0; tetrimino.size(); i++) {
+			if (tetrimino[i].GetX() >= WIDTH || 
+				tetrimino[i].GetX() <= 0) {
+				return true;
+			}
+		}
+		return false;	
+	} 
+	bool IsLand(vector<Vector2D> &tetrimino ) {
+		for (int i = 0; tetrimino.size(); i++) {
+			if (tetrimino[i].GetY() >= HEIGHT ||
+				Grid[tetrimino[i].GetX()][tetrimino[i].GetY()]) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	vector < vector <bool> > GetCoordinate() {
+		return Grid;
+	}
+
+	~Board() {}
+
 };
 
 class Renderer {
 private:
-	vector <Point> oldCoordinate;
-	vector <Point> newCoordinate;
+	vector <Vector2D> tetriminoPosition;
+	vector < vector <bool> > boardGrid;
 public:
 	Renderer() {
-		oldCoordinate = { Point(-1, -1), Point(-1, -1), Point(-1, -1), Point(-1, -1) };
+		
 	}
 	~Renderer() {}
 
-	void Update() {
+	void Update(Tetrimino tetrimino, Board board) {
+		this->tetriminoPosition = tetrimino.GetCoordinate();
+		this->boardGrid = board.GetCoordinate();
+		
 	}
 
-	void Render(GameObject &g) {
-
-		newCoordinate = g.GetCoordinate();
+	void Render() {
 
 		system("cls");
 		
 		for (int i = 0; i < POINT_COUNT; i++) {
-			gotoxy(newCoordinate[i].GetX(), newCoordinate[i].GetY());
+			gotoxy(tetriminoPosition[i].GetX(), tetriminoPosition[i].GetY());
 			cout << "#";
 		}
 
 		gotoxy(0, CanvasSize::HEIGHT);
+		
 		for (int i = 0; i < POINT_COUNT; i++) {
-			cout << "(" << newCoordinate[i].GetX() << "," << newCoordinate[i].GetY() << ")" << endl;
+			cout << "(" << tetriminoPosition[i].GetX() << "," << tetriminoPosition[i].GetY() << ")" << endl;
 		}
 
 	}
@@ -262,49 +289,21 @@ public:
 
 };
 
-class Board : GameObject{
-private:
-	bool Grid[WIDTH][HEIGHT];
 
-public:
-	Board(){
-		for (int i = 0; i < WIDTH; i++) {
-			for (int j = 0; j < HEIGHT; j++) {
-				Grid[i][j] = false;
-			}
-		}
-	}
-
-	void Update() {
-
-	}
-
-	bool IsWall(){ 
-
-	} 
-	bool IsLand() {
-
-	}
-
-	vector <Point> GetCoordinate() {
-
-	}
-	~Board(){}
-
-
-};
 int main() {
 
 	Tetrimino t(I_BLOCK);
 
 	Renderer r;
+	Board board;
 
-	for(int i=0; i<100; i++){
-		t.Update();
-		r.Render(t);
+	for (int i = 0; i < 100; i++) {
+		t.Control();
+		r.Update(t, board);
+		r.Render();
 
 		Sleep(100);
 	}
 
-	r.Render(t);
+	r.Render();
 }
